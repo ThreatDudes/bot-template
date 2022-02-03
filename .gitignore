@@ -3,8 +3,8 @@
 .vscode/
 
 # Config
-bot.json
-db.json
+config/bot.json
+config/db.json
 package-lock.json
 
 # Logs
