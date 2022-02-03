@@ -1,3 +1,12 @@
+# Editor Configs
+.idea/
+.vscode/
+
+# Config
+bot.json
+db.json
+package-lock.json
+
 # Logs
 logs
 *.log

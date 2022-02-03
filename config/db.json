@@ -1,0 +1,16 @@
+{
+  "db_host": "135.181.84.52",
+  "db_port": 5432,
+  "db_dialect": "postgres",
+  "db_username": "dev",
+  "db_password": "Bazinga2230!!",
+  "db_name": "cauldron",
+  "db_schema": "bot_template",
+  "db_prod": false,
+  "db_pool": {
+    "max": 5,
+    "min": 0,
+    "acquire": 30000,
+    "idle": 10000
+  }
+}
