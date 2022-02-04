@@ -3,15 +3,13 @@ const DataTypes = require('sequelize');
 const guild = db.connection.define('guild', {
   guild_id: {
     primaryKey: true, type: DataTypes.STRING, required: true,
-  },
-  guild_name: {
-    type: DataTypes.STRING,
-  },
-  bot_admin_role: {
-    type: DataTypes.STRING, required: false,
+  }, bot_admin_role: {
+    type: DataTypes.STRING, required: true,
+  }, bot_config_channel: {
+    type: DataTypes.STRING, required: true,
   },
 }, {
-  schema: db.config.db_schema,
+  schema: db.config.dbSchema,
 });
 
 module.exports = guild;

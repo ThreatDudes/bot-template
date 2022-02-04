@@ -1,11 +1,9 @@
-const fs = require('fs');
 const discord = require('discord.js');
 const botConfig = require('../config/bot.json');
-
-// Setup database
+const registerCommands = require('./utils/register_commands.js');
 require('./utils/db.js');
+require('./utils/db_migrations.js');
 const Guild = require('./models/guild.js');
-const {registerCommands} = require('./utils/register_commands');
 
 // Create client with read and write intent only
 const client = new discord.Client({
@@ -16,26 +14,9 @@ const client = new discord.Client({
   ],
 });
 
-// Setup command collection and import command files
-client.commands = new discord.Collection();
-const commandFiles = fs.readdirSync('./src/commands')
-    .filter((file) => file.endsWith('.js'));
-
-client.on('debug', (error) => {
-  console.log('[discord.js]', error);
-});
-
-// Sync database models and register commands
 client.on('ready', async (c) => {
   console.log(`Ready! Logged in as ${c.user.tag}`);
-  // Database models go here
-  Guild.sync();
-  // Register commands with the bot
-  for (const file of commandFiles) {
-    const command = require(`./commands/${file}`);
-    client.commands.set(command.data.name, command);
-  }
-  registerCommands(client.application.id, botConfig.botToken, commandFiles);
+  registerCommands(client, botConfig.botToken);
 });
 
 client.on('interactionCreate', async (interaction) => {
@@ -54,21 +35,37 @@ client.on('interactionCreate', async (interaction) => {
   }
 });
 
-// joined a server
-client.on('guildCreate', (guild) => {
-  console.log('Joined a guild');
-  Guild.create({
-    guild_id: guild.id,
-    guild_name: guild.name,
-    bot_admin_role: guild.roles.highest.id,
+client.on('guildCreate', async (currentGuild) => {
+  await currentGuild.channels.create(
+      'bot-settings', {
+        type: 0,
+        permissionOverwrites: [
+          {
+            id: currentGuild.id,
+            deny: [discord.PermissionFlagsBits.ViewChannel],
+          },
+          {
+            id: currentGuild.roles.highest.id,
+            allow: [discord.PermissionFlagsBits.ViewChannel],
+          },
+        ],
+      }).then((result) => {
+    Guild.create({
+      guild_id: currentGuild.id,
+      guild_name: currentGuild.name,
+      bot_admin_role: currentGuild.roles.highest.id,
+      bot_config_channel: result.id,
+    });
   });
 });
 
-// removed from a server
-client.on('guildDelete', (guild) => {
+client.on('guildDelete', (currentGuild) => {
+  Guild.findByPk(currentGuild.id).then((retrievedGuild) => {
+    currentGuild.channels.cache.get(retrievedGuild.bot_config_channel).delete();
+  });
   Guild.destroy({
     where: {
-      guild_id: guild.id,
+      guild_id: currentGuild.id,
     },
   });
 });

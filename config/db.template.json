@@ -1,8 +1,16 @@
 {
-  "db_host": "",
-  "db_port": 5432,
-  "db_dialect": "postgres",
-  "db_username": "",
-  "db_password": "",
-  "db_name": ""
+  "dbHost": "",
+  "dbPort": 5432,
+  "dbDialect": "postgres",
+  "dbUsername": "",
+  "dbPassword": "",
+  "dbName": "",
+  "dbSchema": "bot_template",
+  "dbProd": false,
+  "dbPool": {
+    "max": 5,
+    "min": 0,
+    "acquire": 30000,
+    "idle": 10000
+  }
 }
